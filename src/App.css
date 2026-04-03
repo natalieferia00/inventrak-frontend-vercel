@@ -1,0 +1,240 @@
+/* --- INVENTRAK 2026: PROTOCOLO VISUAL UNIFICADO --- */
+:root {
+  --sidebar-width: 280px;
+  --bg-deep: #020408;
+  --bg-card: rgba(13, 17, 23, 0.95); 
+  --accent-cyan: #00f2ff;
+  --accent-magenta: #ff00ff;
+  --accent-blue: #2563eb;      
+  --text-bright: #f0f9ff;
+  --text-ghost: #94a3b8;
+  --glass-border: rgba(0, 242, 255, 0.15);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- RESET & GLOBAL --- */
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+  font-family: 'Inter', 'Segoe UI', sans-serif; 
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-bright);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+    linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 45px 45px, 45px 45px;
+}
+
+.app-container { display: flex; width: 100%; }
+
+/* --- BOTÓN HAMBURGUESA (MÓVIL) --- */
+.menu-toggle {
+  display: none; /* Oculto en escritorio */
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: var(--accent-cyan);
+  color: #000;
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+  width: var(--sidebar-width);
+  background: rgba(5, 7, 10, 0.98);
+  border-right: 1px solid var(--glass-border);
+  display: flex; 
+  flex-direction: column;
+  position: fixed; 
+  height: 100vh;
+  backdrop-filter: blur(20px); 
+  z-index: 1000;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-section { 
+  padding: 2.5rem 1.5rem; 
+  border-bottom: 1px solid var(--glass-border); 
+}
+.logo-section h1 { 
+  font-size: 1.4rem; 
+  letter-spacing: 3px; 
+  color: var(--accent-cyan); 
+  text-transform: uppercase; 
+}
+
+.nav-links { padding: 1.5rem 0.8rem; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 15px; padding: 1rem;
+  color: var(--text-ghost); text-decoration: none; font-size: 0.75rem;
+  font-weight: 800; letter-spacing: 1.5px; transition: var(--transition);
+  border-radius: 8px; margin-bottom: 5px;
+}
+.nav-item:hover, .nav-item.active { 
+  color: var(--accent-cyan); 
+  background: rgba(0, 242, 255, 0.08); 
+}
+.nav-item.active { 
+  border-left: 4px solid var(--accent-cyan); 
+}
+
+/* --- MAIN CONTENT --- */
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1; 
+  padding: 3rem;
+  width: 100%;
+  transition: var(--transition);
+}
+
+/* --- DASHBOARD: MÉTRICAS --- */
+.dashboard-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+  gap: 1.5rem; 
+  margin-bottom: 2rem; 
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%; background: var(--accent-cyan);
+  box-shadow: 0 0 15px var(--accent-cyan);
+}
+
+.kpi-card.danger::before { background: var(--accent-magenta); }
+
+.kpi-value { font-size: 2.5rem; font-weight: 900; color: #fff; }
+
+/* --- TABLAS & CARDS --- */
+.card-table, .table-card { 
+  background: var(--bg-card); 
+  border: 1px solid var(--glass-border); 
+  padding: 1.5rem; 
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  overflow-x: auto; 
+}
+
+.table-cyberpunk { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+
+.table-cyberpunk th { 
+  text-align: left; 
+  color: var(--accent-cyan); 
+  font-size: 0.7rem; 
+  text-transform: uppercase;
+  padding: 1rem; 
+  border-bottom: 2px solid var(--glass-border); 
+}
+
+.table-cyberpunk td { 
+  padding: 1rem; 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+}
+
+/* --- FORMULARIOS --- */
+.form-container, .form-card { 
+  background: var(--bg-card); 
+  border: 1px solid var(--glass-border); 
+  padding: 2rem; 
+  border-radius: 12px;
+}
+
+.grid-form { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 1.5rem; 
+}
+
+input, select, textarea {
+  background: rgba(0, 0, 0, 0.4); 
+  border: 1px solid var(--glass-border);
+  padding: 0.8rem; 
+  color: #fff; 
+  border-radius: 6px; 
+  width: 100%;
+}
+
+input:focus { border-color: var(--accent-cyan); outline: none; }
+
+.btn-primary {
+  background: var(--accent-cyan); 
+  color: #000; 
+  border: none;
+  padding: 0.8rem 1.5rem; 
+  font-weight: 800; 
+  cursor: pointer;
+  border-radius: 6px; 
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4); }
+
+/* --- RESPONSIVO (TABLETS) --- */
+@media (max-width: 1024px) {
+  :root { --sidebar-width: 80px; }
+  .nav-item span, .logo-section h1, .sidebar-footer { display: none; }
+  .nav-item { justify-content: center; }
+  .main-content { margin-left: 80px; }
+}
+
+/* --- RESPONSIVO (MÓVILES) --- */
+@media (max-width: 768px) {
+  .menu-toggle { display: flex; } /* Mostramos hamburguesa */
+
+  .sidebar {
+    left: -100%; /* Escondida */
+    transform: translateX(0);
+    width: 260px;
+    position: fixed;
+  }
+
+  .sidebar.active {
+    left: 0; /* Aparece al pulsar */
+    box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 1.5rem;
+    padding-top: 5rem;
+  }
+
+  .grid-form { grid-template-columns: 1fr; }
+  
+  .table-cyberpunk { min-width: 600px; } /* Scroll horizontal */
+}
+
+/* --- ESTADO ONLINE --- */
+.sidebar-footer { padding: 1.5rem; border-top: 1px solid var(--glass-border); font-size: 0.65rem; }
+.status-dot { 
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px;
+  background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan);
+}
