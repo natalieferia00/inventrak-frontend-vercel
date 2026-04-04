@@ -403,3 +403,104 @@ input:focus { border-color: var(--accent-cyan); outline: none; }
     grid-template-columns: 1fr;
   }
 }
+/* Brillo especial para el valor del inventario */
+.accent-blue::before {
+  background: var(--accent-blue) !important;
+  box-shadow: 0 0 15px var(--accent-blue) !important;
+}
+
+/* Barra de progreso con resplandor (Glow) */
+.progress-bar-glow {
+  height: 100%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan), 0 0 5px #fff;
+  border-radius: 2px;
+  transition: width 1s ease-in-out;
+}
+
+/* Texto de KPI con sombra de neón */
+.kpi-value {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Animación de entrada para las cards */
+.kpi-card {
+  animation: slideIn 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Escalonar la animación de las tarjetas */
+.kpi-card:nth-child(1) { animation-delay: 0.1s; }
+.kpi-card:nth-child(2) { animation-delay: 0.2s; }
+.kpi-card:nth-child(3) { animation-delay: 0.3s; }
+.kpi-card:nth-child(4) { animation-delay: 0.4s; }
+.kpi-card:nth-child(5) { animation-delay: 0.5s; }
+.kpi-card:nth-child(6) { animation-delay: 0.6s; }
+/* Botón de expansión */
+.btn-expand {
+  background: transparent;
+  border: none;
+  color: var(--accent-cyan);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.btn-expand:hover {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 5px var(--accent-cyan));
+}
+
+/* Fila de detalles */
+.detail-row td {
+  padding: 0 !important; /* Para que el div interno controle el padding */
+  background: rgba(0, 242, 255, 0.02);
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.detail-content {
+  padding: 1.5rem;
+  border-left: 3px solid var(--accent-cyan);
+  animation: slideDown 0.3s ease-out;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.detail-item label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--accent-cyan);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.detail-item p {
+  color: var(--text-bright);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.detail-item code {
+  color: var(--text-ghost);
+  font-size: 0.7rem;
+}
+
+/* Animación */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.row-expanded {
+  background: rgba(0, 242, 255, 0.05) !important;
+}
