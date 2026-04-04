@@ -238,3 +238,36 @@ input:focus { border-color: var(--accent-cyan); outline: none; }
   width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px;
   background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan);
 }
+
+/* Botones de acción en la tabla */
+.btn-icon {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-ghost);
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon.edit:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+}
+
+.btn-icon.trash:hover {
+  color: var(--accent-magenta);
+  border-color: var(--accent-magenta);
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.2);
+}
+
+/* Ajuste para la celda de acciones */
+.col-actions {
+  text-align: right;
+  min-width: 100px;
+}

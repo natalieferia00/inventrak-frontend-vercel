@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
   LayoutDashboard, 
@@ -22,17 +22,20 @@ import CategoriesView from './components/CategoriesView';
 // URL API
 const API = 'https://inventrak-backend.onrender.com/api';
 
-function App() {
+function AppContent() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [refresh, setRefresh] = useState(0); 
   const [loading, setLoading] = useState(true);
-
-  // ✅ Estado del menú móvil
   const [menuOpen, setMenuOpen] = useState(false);
+  
+  // Estado para el producto que se está editando
+  const [productToEdit, setProductToEdit] = useState(null);
 
+  const navigate = useNavigate();
   const triggerRefresh = () => setRefresh(prev => prev + 1);
 
+  // FETCH DATA: Sincronización con el servidor
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -52,88 +55,115 @@ function App() {
     fetchData();
   }, [refresh]);
 
+  // LOGICA CRUD: ELIMINAR
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm("¿Estás seguro de eliminar este artículo?")) {
+      try {
+        await axios.delete(`${API}/products/${id}`);
+        triggerRefresh();
+      } catch (err) {
+        alert("Error al eliminar el producto");
+      }
+    }
+  };
+
+  // LOGICA CRUD: PREPARAR EDICIÓN
+  const handleEditProduct = (product) => {
+    setProductToEdit(product);
+    navigate('/productos/nuevo'); // Redirigimos al formulario
+  };
+
+  return (
+    <div className="app-container">
+
+      {/* BOTÓN HAMBURGUESA MÓVIL */}
+      <button 
+        className="menu-toggle"
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle Menu"
+      >
+        {menuOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
+
+      {/* SIDEBAR */}
+      <aside className={`sidebar ${menuOpen ? 'active' : ''}`}>
+        <div className="logo-section">
+          <h1>InvenTrak</h1>
+        </div>
+
+        <nav className="nav-links">
+          <CustomLink to="/" icon={<LayoutDashboard size={20}/>} label="DASHBOARD" closeMenu={() => setMenuOpen(false)} />
+          <CustomLink to="/productos" icon={<Package size={20}/>} label="PRODUCTOS" closeMenu={() => setMenuOpen(false)} />
+          <CustomLink to="/productos/nuevo" icon={<PlusCircle size={20}/>} label="AÑADIR" closeMenu={() => setMenuOpen(false)} />
+          <CustomLink to="/movimientos" icon={<ArrowUpDown size={20}/>} label="STOCK" closeMenu={() => setMenuOpen(false)} />
+          <CustomLink to="/categorias" icon={<Layers size={20}/>} label="CATEGORÍAS" closeMenu={() => setMenuOpen(false)} />
+        </nav>
+        
+        <div className="sidebar-footer">
+          <span className={`status-dot ${loading ? 'syncing' : 'online'}`}></span>
+          {loading ? 'SINCRONIZANDO...' : 'SISTEMA ONLINE'}
+        </div>
+      </aside>
+
+      {/* CONTENIDO PRINCIPAL */}
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={
+            <Dashboard products={products} categories={categories} />
+          } />
+
+          <Route path="/productos" element={
+            <ProductsView 
+              products={products} 
+              onEdit={handleEditProduct}
+              onDelete={handleDeleteProduct}
+            />
+          } />
+
+          <Route path="/productos/nuevo" element={
+            <ProductForm 
+              categories={categories} 
+              onRefresh={triggerRefresh} 
+              editingProduct={productToEdit}
+              setEditingProduct={setProductToEdit}
+            />
+          } />
+
+          <Route path="/categorias" element={
+            <CategoriesView 
+              categories={categories} 
+              onRefresh={triggerRefresh} 
+            />
+          } />
+          
+          <Route path="/movimientos" element={
+            <MovementsView 
+              products={products} 
+              onRefresh={triggerRefresh} 
+            />
+          } />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+/**
+ * WRAPPER PARA ROUTER (Necesario para usar useNavigate)
+ */
+function App() {
   return (
     <Router>
-      <div className="app-container">
-
-        {/* ✅ BOTÓN HAMBURGUESA (Configurado pequeño a la izquierda) */}
-        <button 
-          className="menu-toggle"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Abrir menú"
-        >
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-
-        {/* SIDEBAR */}
-        <aside className={`sidebar ${menuOpen ? 'active' : ''}`}>
-          <div className="logo-section">
-            <h1>InvenTrak</h1>
-          </div>
-
-          <nav className="nav-links">
-            <CustomLink to="/" icon={<LayoutDashboard size={20}/>} label="DASHBOARD" closeMenu={() => setMenuOpen(false)} />
-            <CustomLink to="/productos" icon={<Package size={20}/>} label="PRODUCTOS" closeMenu={() => setMenuOpen(false)} />
-            <CustomLink to="/productos/nuevo" icon={<PlusCircle size={20}/>} label="AÑADIR" closeMenu={() => setMenuOpen(false)} />
-            <CustomLink to="/movimientos" icon={<ArrowUpDown size={20}/>} label="STOCK" closeMenu={() => setMenuOpen(false)} />
-            <CustomLink to="/categorias" icon={<Layers size={20}/>} label="CATEGORÍAS" closeMenu={() => setMenuOpen(false)} />
-          </nav>
-          
-          <div className="sidebar-footer">
-            <span className={`status-dot ${loading ? 'syncing' : 'online'}`}></span>
-            {loading ? 'SINCRONIZANDO...' : 'SISTEMA ONLINE'}
-          </div>
-        </aside>
-
-        {/* CONTENIDO */}
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={
-              <Dashboard products={products} categories={categories} />
-            } />
-
-            <Route path="/productos" element={
-              <ProductsView 
-                products={products} 
-                categories={categories} 
-                onRefresh={triggerRefresh} 
-              />
-            } />
-
-            <Route path="/productos/nuevo" element={
-              <ProductForm 
-                categories={categories} 
-                onRefresh={triggerRefresh} 
-              />
-            } />
-
-            <Route path="/categorias" element={
-              <CategoriesView 
-                categories={categories} 
-                onRefresh={triggerRefresh} 
-              />
-            } />
-            
-            <Route path="/movimientos" element={
-              <MovementsView 
-                products={products} 
-                onRefresh={triggerRefresh} 
-              />
-            } />
-          </Routes>
-        </main>
-      </div>
+      <AppContent />
     </Router>
   );
 }
 
 /**
- * LINK PERSONALIZADO CON LÓGICA DE CIERRE AUTOMÁTICO
+ * LINK PERSONALIZADO CON LÓGICA DE CIERRE
  */
 function CustomLink({ to, icon, label, closeMenu }) {
   const location = useLocation();
-
-  // Comprobar si la ruta actual coincide con el link
   const isActive = to === "/" 
     ? location.pathname === "/" 
     : location.pathname.startsWith(to);
@@ -143,10 +173,7 @@ function CustomLink({ to, icon, label, closeMenu }) {
       to={to} 
       className={`nav-item ${isActive ? 'active' : ''}`}
       onClick={() => {
-        // Cerramos el menú solo si estamos en resolución móvil
-        if (window.innerWidth < 768) {
-          closeMenu();
-        }
+        if (window.innerWidth < 768) closeMenu();
       }}
     >
       {icon} <span>{label}</span>
