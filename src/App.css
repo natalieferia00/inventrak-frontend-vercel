@@ -347,3 +347,59 @@ input:focus { border-color: var(--accent-cyan); outline: none; }
     width: 100%;
   }
 }
+
+/* --- DASHBOARD CHARTS --- */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr; /* El de barras es más ancho */
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  padding: 1.5rem;
+  border-radius: 12px;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.chart-header h3 {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--text-ghost);
+  text-transform: uppercase;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 300px;
+}
+
+.neon-text {
+  color: var(--accent-magenta);
+  text-shadow: 0 0 15px var(--accent-magenta);
+}
+
+.kpi-footer {
+  font-size: 0.65rem;
+  color: var(--text-ghost);
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Responsivo para móviles */
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
