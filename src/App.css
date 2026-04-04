@@ -504,3 +504,24 @@ input:focus { border-color: var(--accent-cyan); outline: none; }
 .row-expanded {
   background: rgba(0, 242, 255, 0.05) !important;
 }
+.note-row-animation {
+  animation: slideDownFade 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 2px solid var(--accent-cyan);
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efecto hover en el ojito */
+.btn-icon:hover {
+  filter: drop-shadow(0 0 5px var(--accent-cyan));
+  transform: scale(1.1);
+}
