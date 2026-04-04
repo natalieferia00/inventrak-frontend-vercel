@@ -19,79 +19,108 @@ const ProductForm = ({ categories, onRefresh }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Enviamos el objeto product al backend de Render
       await axios.post(`${API}/products`, product);
-      onRefresh(); // Refresca los datos globales en App.jsx
-      navigate('/productos'); // Te devuelve a la tabla automáticamente
+      
+      if (onRefresh) onRefresh(); // Refresca los datos si la función existe
+      
+      alert("✅ Producto guardado correctamente");
+      navigate('/productos'); // Redirección automática a la tabla
     } catch (err) {
       console.error("Error al guardar el producto:", err);
-      alert("Error al conectar con el servidor de Render");
+      alert("❌ Error: Verifica que el SKU sea único o revisa la conexión con Render.");
     }
   };
 
   return (
-    <div className="form-container card">
-      <h2>➕ REGISTRAR NUEVO ARTÍCULO</h2>
-      <form className="grid-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Nombre del Producto</label>
-          <input 
-            type="text" 
-            required 
-            value={product.name}
-            onChange={(e) => setProduct({...product, name: e.target.value})}
-            placeholder="Ej: Sensor Pro X" 
-          />
-        </div>
-        
-        <div className="form-group">
-          <label>SKU / Código</label>
-          <input 
-            type="text" 
-            required 
-            value={product.sku}
-            onChange={(e) => setProduct({...product, sku: e.target.value})}
-            placeholder="INV-001" 
-          />
+    <div className="form-container card animate-fade">
+      <div className="view-header">
+        <h2>➕ REGISTRAR NUEVO ARTÍCULO</h2>
+      </div>
+
+      <form className="form-cyber" onSubmit={handleSubmit}>
+        <div className="grid-form">
+          {/* NOMBRE */}
+          <div className="form-group">
+            <label>Nombre del Producto</label>
+            <input 
+              type="text" 
+              required 
+              value={product.name}
+              onChange={(e) => setProduct({...product, name: e.target.value})}
+              placeholder="Ej: Sensor Pro X" 
+              autoComplete="off"
+            />
+          </div>
+          
+          {/* SKU */}
+          <div className="form-group">
+            <label>SKU / Código</label>
+            <input 
+              type="text" 
+              required 
+              value={product.sku}
+              onChange={(e) => setProduct({...product, sku: e.target.value})}
+              placeholder="INV-001" 
+              autoComplete="off"
+            />
+          </div>
+
+          {/* DESCRIPCIÓN */}
+          <div className="form-group full-width">
+            <label>Descripción Detallada</label>
+            <textarea 
+              rows="3"
+              value={product.description}
+              onChange={(e) => setProduct({...product, description: e.target.value})}
+              placeholder="Ingrese las especificaciones técnicas del artículo..." 
+            />
+          </div>
+
+          {/* STOCK INICIAL */}
+          <div className="form-group">
+            <label>Stock Inicial</label>
+            <input 
+              type="number" 
+              min="0"
+              value={product.current_stock}
+              onChange={(e) => setProduct({...product, current_stock: parseInt(e.target.value) || 0})}
+            />
+          </div>
+
+          {/* CATEGORÍA */}
+          <div className="form-group">
+            <label>Categoría</label>
+            <select 
+              required
+              value={product.category_id}
+              onChange={(e) => setProduct({...product, category_id: e.target.value})}
+            >
+              <option value="">Seleccione una categoría...</option>
+              {categories.map(cat => (
+                // Usamos cat.id porque así lo confirmamos en tu base de datos de Railway
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="form-group full-width">
-          <label>Descripción Detallada</label>
-          <textarea 
-            value={product.description}
-            onChange={(e) => setProduct({...product, description: e.target.value})}
-            placeholder="Ingrese las especificaciones técnicas..." 
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Stock Inicial</label>
-          <input 
-            type="number" 
-            value={product.current_stock}
-            onChange={(e) => setProduct({...product, current_stock: parseInt(e.target.value)})}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Categoría</label>
-          <select 
-            required
-            value={product.category_id}
-            onChange={(e) => setProduct({...product, category_id: e.target.value})}
-          >
-            <option value="">Seleccione...</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group full-width" style={{ display: 'flex', gap: '10px' }}>
-          <button type="submit" className="btn-save">
-            <Save size={18} /> GUARDAR EN BASE DE DATOS
+        {/* ACCIONES DEL FORMULARIO */}
+        <div className="form-actions">
+          <button type="submit" className="btn-cyber btn-save">
+            <Save size={18} /> 
+            <span>GUARDAR EN BASE DE DATOS</span>
           </button>
-          <button type="button" className="btn-cancel" onClick={() => navigate('/productos')}>
-            <XCircle size={18} /> CANCELAR
+          
+          <button 
+            type="button" 
+            className="btn-cyber btn-cancel" 
+            onClick={() => navigate('/productos')}
+          >
+            <XCircle size={18} /> 
+            <span>CANCELAR</span>
           </button>
         </div>
       </form>

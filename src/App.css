@@ -271,3 +271,79 @@ input:focus { border-color: var(--accent-cyan); outline: none; }
   text-align: right;
   min-width: 100px;
 }
+/* --- BOTONES DE ACCIÓN (FORMULARIOS) --- */
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-end; /* Alinea a la derecha como en tu referencia */
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+/* Estilo Base Cyberpunk */
+.btn-cyber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0.8rem 1.8rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid;
+  border-radius: 4px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Botón GUARDAR (Cian) */
+.btn-save {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  background: rgba(0, 242, 255, 0.05);
+  box-shadow: inset 0 0 10px rgba(0, 242, 255, 0.1);
+}
+
+.btn-save:hover {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Botón CANCELAR (Magenta) */
+.btn-cancel {
+  color: var(--accent-magenta);
+  border-color: var(--accent-magenta);
+  background: rgba(255, 0, 255, 0.05);
+  box-shadow: inset 0 0 10px rgba(255, 0, 255, 0.1);
+}
+
+.btn-cancel:hover {
+  background: var(--accent-magenta);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Efecto de brillo al presionar */
+.btn-cyber:active {
+  transform: translateY(0);
+  filter: brightness(1.2);
+}
+
+/* Ajuste responsivo para botones en móviles */
+@media (max-width: 480px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  .btn-cyber {
+    width: 100%;
+  }
+}
