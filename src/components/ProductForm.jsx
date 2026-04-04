@@ -24,18 +24,18 @@ const ProductForm = ({ categories, onRefresh }) => {
       
       if (onRefresh) onRefresh(); // Refresca los datos si la función existe
       
-      alert("✅ Producto guardado correctamente");
+      alert("Producto guardado correctamente");
       navigate('/productos'); // Redirección automática a la tabla
     } catch (err) {
       console.error("Error al guardar el producto:", err);
-      alert("❌ Error: Verifica que el SKU sea único o revisa la conexión con Render.");
+      alert(" Error: Verifica que el SKU sea único o revisa la conexión con Render.");
     }
   };
 
   return (
     <div className="form-container card animate-fade">
       <div className="view-header">
-        <h2>➕ REGISTRAR NUEVO ARTÍCULO</h2>
+        <h2>REGISTRAR NUEVO ARTÍCULO</h2>
       </div>
 
       <form className="form-cyber" onSubmit={handleSubmit}>
