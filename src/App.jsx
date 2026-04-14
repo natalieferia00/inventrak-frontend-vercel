@@ -70,7 +70,14 @@ function AppContent() {
   // LOGICA CRUD: PREPARAR EDICIÓN
   const handleEditProduct = (product) => {
     setProductToEdit(product);
-    navigate('/productos/nuevo'); // Redirigimos al formulario
+    navigate('/productos/nuevo');
+  };
+
+  // LOGICA CRUD: PREPARAR CREACIÓN (LIMPIEZA DE ESTADO)
+  const handleAddNewProduct = () => {
+    setProductToEdit(null); // <--- Clave: Limpia el estado para que no cargue datos viejos
+    setMenuOpen(false);
+    navigate('/productos/nuevo');
   };
 
   return (
@@ -94,7 +101,16 @@ function AppContent() {
         <nav className="nav-links">
           <CustomLink to="/" icon={<LayoutDashboard size={20}/>} label="DASHBOARD" closeMenu={() => setMenuOpen(false)} />
           <CustomLink to="/productos" icon={<Package size={20}/>} label="PRODUCTOS" closeMenu={() => setMenuOpen(false)} />
-          <CustomLink to="/productos/nuevo" icon={<PlusCircle size={20}/>} label="AÑADIR" closeMenu={() => setMenuOpen(false)} />
+          
+          {/* Usamos un div con estilo de nav-item para manejar el reset del formulario */}
+          <div 
+            className={`nav-item ${useLocation().pathname === '/productos/nuevo' && !productToEdit ? 'active' : ''}`}
+            onClick={handleAddNewProduct}
+            style={{ cursor: 'pointer' }}
+          >
+            <PlusCircle size={20}/> <span>AÑADIR</span>
+          </div>
+
           <CustomLink to="/movimientos" icon={<ArrowUpDown size={20}/>} label="STOCK" closeMenu={() => setMenuOpen(false)} />
           <CustomLink to="/categorias" icon={<Layers size={20}/>} label="CATEGORÍAS" closeMenu={() => setMenuOpen(false)} />
         </nav>
@@ -148,9 +164,6 @@ function AppContent() {
   );
 }
 
-/**
- * WRAPPER PARA ROUTER (Necesario para usar useNavigate)
- */
 function App() {
   return (
     <Router>
@@ -159,9 +172,6 @@ function App() {
   );
 }
 
-/**
- * LINK PERSONALIZADO CON LÓGICA DE CIERRE
- */
 function CustomLink({ to, icon, label, closeMenu }) {
   const location = useLocation();
   const isActive = to === "/" 
