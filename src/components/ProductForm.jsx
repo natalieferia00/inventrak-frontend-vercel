@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Save, XCircle } from 'lucide-react';
+import { Save, XCircle, AlertCircle, CloudOff } from 'lucide-react';
 
 const API = 'https://inventrak-backend.onrender.com/api';
 
 const ProductForm = ({ categories, onRefresh, editingProduct, setEditingProduct }) => {
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
   
-  // Estado inicial
   const initialState = {
     sku: '',
     name: '',
@@ -20,7 +20,6 @@ const ProductForm = ({ categories, onRefresh, editingProduct, setEditingProduct 
 
   const [product, setProduct] = useState(initialState);
 
-  // EFECTO PARA CARGAR DATOS: Si editingProduct tiene algo, llenamos el formulario
   useEffect(() => {
     if (editingProduct) {
       setProduct({
@@ -36,68 +35,91 @@ const ProductForm = ({ categories, onRefresh, editingProduct, setEditingProduct 
     }
   }, [editingProduct]);
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  // LOG PARA DEPURAR: Mira en la consola qué ID tiene el objeto
-  console.log("Producto a editar:", editingProduct);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-  try {
-    if (editingProduct) {
-      // Intenta con _id si id sale undefined, o viceversa
-      const id = editingProduct.id || editingProduct._id; 
+    const id = editingProduct?.id || editingProduct?._id;
+
+    try {
+      if (editingProduct) {
+        if (!id) throw new Error("ID no encontrado");
+        await axios.put(`${API}/products/${id}`, product);
+      } else {
+        await axios.post(`${API}/products`, product);
+      }
       
-      if (!id) {
-        alert("Error: No se encontró el ID del producto para actualizar.");
-        return;
+      if (onRefresh) onRefresh();
+      setEditingProduct(null);
+      navigate('/productos');
+    } catch (err) {
+      console.error("Fallo en servidor, activando persistencia local:", err);
+
+      // --- ESTRATEGIA DE RESPALDO (LOCALSTORAGE) ---
+      const savedProducts = JSON.parse(localStorage.getItem('it_products') || '[]');
+      
+      const newLocalProduct = {
+        ...product,
+        id: id || Date.now(), // Usamos el ID existente o generamos uno temporal
+        category_name: categories.find(c => c.id == product.category_id)?.name || 'Sin categoría',
+        isLocal: true // Marca visual para Natalie
+      };
+
+      let updatedProducts;
+      if (editingProduct) {
+        updatedProducts = savedProducts.map(p => (p.id == id || p._id == id) ? newLocalProduct : p);
+      } else {
+        updatedProducts = [...savedProducts, newLocalProduct];
       }
 
-      await axios.put(`${API}/products/${id}`, product);
-      alert("Producto actualizado correctamente");
-    } else {
-      await axios.post(`${API}/products`, product);
-      alert("Producto guardado correctamente");
+      // Guardamos en el "espejo" local
+      localStorage.setItem('it_products', JSON.stringify(updatedProducts));
+      
+      // Feedback visual
+      setError("Nota: El servidor está offline. Se guardó localmente en este dispositivo.");
+      
+      // Forzamos actualización de App.jsx y volvemos a la lista
+      if (onRefresh) onRefresh();
+      
+      // Retrasamos la navegación un poco para que alcance a leer el error
+      setTimeout(() => {
+        setEditingProduct(null);
+        navigate('/productos');
+      }, 1500);
     }
-    
-    if (onRefresh) onRefresh();
-    setEditingProduct(null);
-    navigate('/productos'); 
-  } catch (err) {
-    console.error("Error al procesar el producto:", err);
-    // Esto te dirá si el error es porque la ruta no existe (404)
-    alert("Error 404: No se encontró la ruta en el servidor. Revisa el endpoint del backend.");
-  }
-};
+  };
+
   return (
     <div className="form-container card animate-fade">
       <div className="view-header">
         <h2>{editingProduct ? 'EDITAR ARTÍCULO' : 'REGISTRAR NUEVO ARTÍCULO'}</h2>
       </div>
 
+      {error && (
+        <div className="status-banner offline">
+          <AlertCircle size={16} /> {error} <CloudOff size={16} />
+        </div>
+      )}
+
       <form className="form-cyber" onSubmit={handleSubmit}>
         <div className="grid-form">
           <div className="form-group">
             <label>Nombre del Producto</label>
             <input 
-              type="text" 
-              required 
+              type="text" required 
               value={product.name}
               onChange={(e) => setProduct({...product, name: e.target.value})}
               placeholder="Ej: Sensor Pro X" 
-              autoComplete="off"
             />
           </div>
           
           <div className="form-group">
             <label>SKU / Código</label>
             <input 
-              type="text" 
-              required 
+              type="text" required 
               value={product.sku}
               onChange={(e) => setProduct({...product, sku: e.target.value})}
               placeholder="INV-001" 
-              autoComplete="off"
-              // Opcional: Deshabilitar SKU en edición si no permites cambiarlo
               disabled={!!editingProduct} 
             />
           </div>
@@ -108,7 +130,6 @@ const ProductForm = ({ categories, onRefresh, editingProduct, setEditingProduct 
               rows="3"
               value={product.description}
               onChange={(e) => setProduct({...product, description: e.target.value})}
-              placeholder="Ingrese las especificaciones técnicas..." 
             />
           </div>
 
@@ -116,7 +137,6 @@ const ProductForm = ({ categories, onRefresh, editingProduct, setEditingProduct 
             <label>Stock Actual</label>
             <input 
               type="number" 
-              min="0"
               value={product.current_stock}
               onChange={(e) => setProduct({...product, current_stock: parseInt(e.target.value) || 0})}
             />
@@ -142,7 +162,7 @@ const ProductForm = ({ categories, onRefresh, editingProduct, setEditingProduct 
         <div className="form-actions">
           <button type="submit" className="btn-cyber btn-save">
             <Save size={18} /> 
-            <span>{editingProduct ? 'ACTUALIZAR CAMBIOS' : 'GUARDAR EN BASE DE DATOS'}</span>
+            <span>{editingProduct ? 'ACTUALIZAR CAMBIOS' : 'GUARDAR PRODUCTO'}</span>
           </button>
           
           <button 

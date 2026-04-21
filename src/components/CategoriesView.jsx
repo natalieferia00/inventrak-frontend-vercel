@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Layers, Trash2, PlusCircle, AlertCircle } from 'lucide-react';
+import { Layers, Trash2, PlusCircle, AlertCircle, CloudOff } from 'lucide-react';
 
 const API = 'https://inventrak-backend.onrender.com/api';
 
@@ -15,12 +15,32 @@ const CategoriesView = ({ categories, onRefresh }) => {
     if (!categoryName) return;
 
     try {
+      // Intentamos la petición normal
       await axios.post(`${API}/categories`, { name: categoryName });
       onRefresh();
       e.target.reset();
     } catch (err) {
-      console.error("Error en el servidor:", err.response?.data || err.message);
-      setError("Error 500: El servidor no pudo procesar la categoría. Revisa si el nombre ya existe.");
+      console.error("Error en el servidor (DB Offline):", err.response?.data || err.message);
+      
+      // ESTRATEGIA LOCALSTORAGE: Si falla el server, guardamos localmente
+      const newLocalCategory = { 
+        id: Date.now(), // ID temporal para evitar errores de duplicidad en React
+        name: categoryName,
+        isLocal: true 
+      };
+
+      const saved = JSON.parse(localStorage.getItem('it_categories') || '[]');
+      const updated = [...saved, newLocalCategory];
+      
+      // Actualizamos el almacenamiento
+      localStorage.setItem('it_categories', JSON.stringify(updated));
+      
+      // Mostramos un aviso pero dejamos que la UI siga funcionando
+      setError("Nota: El servidor está offline. La categoría se guardó solo en este dispositivo.");
+      
+      // Forzamos un refresh manual del estado local para que aparezca en la lista
+      onRefresh(); 
+      e.target.reset();
     }
   };
 
@@ -30,14 +50,19 @@ const CategoriesView = ({ categories, onRefresh }) => {
         await axios.delete(`${API}/categories/${id}`);
         onRefresh();
       } catch (err) {
-        setError("No se pudo eliminar: La categoría podría estar en uso por algún producto.");
+        // Si no se puede borrar en server, intentamos borrar en local
+        const saved = JSON.parse(localStorage.getItem('it_categories') || '[]');
+        const updated = saved.filter(c => c.id !== id);
+        localStorage.setItem('it_categories', JSON.stringify(updated));
+        
+        setError("La categoría se eliminó localmente (Servidor no disponible).");
+        onRefresh();
       }
     }
   };
 
   return (
-    <div className="grid-form animate-fade"> {/* Usamos la rejilla de 2 columnas */}
-
+    <div className="grid-form animate-fade">
       {/* TABLA DE CATEGORÍAS */}
       <section className="card-table">
         <div className="view-header">
@@ -45,8 +70,19 @@ const CategoriesView = ({ categories, onRefresh }) => {
         </div>
 
         {error && (
-          <div style={{ color: 'var(--accent-magenta)', marginBottom: '1rem', fontSize: '0.8rem', display: 'flex', gap: '5px' }}>
-            <AlertCircle size={14} /> {error}
+          <div style={{ 
+            color: 'var(--accent-magenta)', 
+            marginBottom: '1rem', 
+            fontSize: '0.8rem', 
+            display: 'flex', 
+            gap: '8px',
+            alignItems: 'center',
+            background: 'rgba(255, 68, 68, 0.1)',
+            padding: '8px',
+            borderRadius: '4px',
+            border: '1px solid var(--accent-magenta)'
+          }}>
+            <AlertCircle size={16} /> {error}
           </div>
         )}
 
@@ -59,10 +95,23 @@ const CategoriesView = ({ categories, onRefresh }) => {
           </thead>
           <tbody>
             {categories.map(c => (
-              <tr key={c.id}> {/* Asegúrate de que aquí sea id */}
-                <td className="col-name">{c.name}</td>
+              <tr key={c.id} className={c.isLocal ? 'local-row' : ''}>
+                <td className="col-name">
+                  {c.name} 
+                  {c.isLocal && (
+                    <span style={{ 
+                      fontSize: '10px', 
+                      color: 'var(--accent-magenta)', 
+                      marginLeft: '10px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '3px'
+                    }}>
+                      <CloudOff size={10} /> LOCAL
+                    </span>
+                  )}
+                </td>
                 <td style={{ textAlign: 'right' }}>
-                  {/* Verifica que handleDelete reciba c.id */}
                   <button className="action-btn" onClick={() => handleDelete(c.id)}>
                     <Trash2 size={18} color="var(--accent-magenta)" />
                   </button>
@@ -89,7 +138,6 @@ const CategoriesView = ({ categories, onRefresh }) => {
           </button>
         </form>
       </aside>
-
     </div>
   );
 };
